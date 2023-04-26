@@ -1,8 +1,9 @@
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public class AdjacencyList {
@@ -11,6 +12,8 @@ public class AdjacencyList {
     // The purpose of nested classes is to group classes that belong together, which
     // makes your code more readable and maintainable
 
+
+    //Nested vertex class representing the city
     class Vertex {
         private String name;
 
@@ -23,6 +26,7 @@ public class AdjacencyList {
         }
     }
 
+    //Nested edge class representing the route between two cities with the weight being travel days
     class Edge {
         private Vertex from;
         private Vertex to;
@@ -75,68 +79,110 @@ public class AdjacencyList {
     // Constructor for adjacencylist
     // just initializes empty hashmap of adjlist, since it has no vertices or edges
     // yet.
+    // counter to count num of cities
+    int counter = 0; 
     public AdjacencyList() {
         adjList = new HashMap<>();
     }
 
-    //Helper function that creates a vertex object
-    //Checks if vertex object with given string
-    //The vertex object is then added as key to adjList hashmap
-    //with an empty HashSet as its value 
-    public void addCity(String cityName) {
-        Vertex city = new Vertex(cityName);
-        adjList.put(city, new HashSet<>());
+    //Function to check if a vertex exists, if not then add it to the adjlist with the empty hashset value
+    //We could loop through the adjlist to check if the vertex exists, but that would be O(n) time
+    //By using a hashmap, we can check if the vertex exists in constant time
+
+    public Vertex addCity(String cityName) {
+        if (!vertex.containsKey(cityName)) { //if not in hashmap, add it to the hashmap and adjlist
+            Vertex city = new Vertex(cityName);//create a new vertex object
+            adjList.put(city, new HashSet<>()); //add the vertex to the adjlist with an empty hashset value
+            vertex.put(cityName, city); //add the vertex to the hashmap3
+            //System.out.println("City added");
+            //counter++;
+            //System.out.println("Number of cities: " + counter);
+            //System.out.println(vertex.get(cityName).getName());
+            return city;
+           
+        } else {
+            //System.out.println("City already exists");
+            //System.out.println(vertex.get(cityName).getName());
+            return vertex.get(cityName);
+        }
     }
 
-    public void search(String cityName) {
-        for (Vertex city : adjList.keySet()) {
-            if (city.getName().equals(cityName)) {
-                System.out.println("The adjacency list contains a vertex with city name '" + cityName + "'");
-                break;
-            }
-        }   
-    }
+    //Function to add vertices to the adjlist if they dont exists already
+    //Incident edges should be added to the adjlist as well in the hashset
+    //The function should check whether or not the vertex exists in the vertex hashmap
+    //f not then create a new vertex object and add it to the hashmap and adjlist
+    //Then create two edge objects for the bidirectional edge
+    //we need to add the edge to the hashset of the from the adjlist
 
     public void addEdge(String from, String to, int weight) {
-        // Get the Vertex objects for the starting and ending cities of the edge
+        // Check if the cities exist in the graph
+        Edge edge1 = new Edge(addCity(from), addCity(to), weight);
+        Edge edge2 = new Edge(addCity(to), addCity(from), weight);
 
-        Vertex fromCity = getCityByName(from);
-        Vertex toCity = getCityByName(to);
-
-        // If either vertex is not found in the graph, return without adding the edge
-        if (fromCity == null || toCity == null) {
-            System.out.println("Invalid edge: one or both vertices not found in the graph.");
-            return;
-        }
-
-        // Create two Edge objects for the bidirectional edge
-        Edge edge1 = new Edge(fromCity, toCity, weight);
-        Edge edge2 = new Edge(toCity, fromCity, weight);
-
-        // Add both edges to the adjacency list of their respective vertices
-        adjList.get(fromCity).add(edge1);
-        adjList.get(toCity).add(edge2);
+        // Add both edges to the hashset via (key.add(value)) in the adjacency list of their respective vertices
+        adjList.get(addCity(from)).add(edge1);
+        adjList.get(addCity(to)).add(edge2);
     }
 
-    private Vertex getCityByName(String cityName) {
-        for (Vertex city : adjList.keySet()) {
-            if (city.getName().equals(cityName)) {
-                return city;
-            }
+    //Function to init edges + vertices from txt.file
+    public void initGraphFromFile(String filename) {
+        try {
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(",");
+            String from = parts[0];
+            String to = parts[1];
+            int weight = Integer.parseInt(parts[2]);
+            addEdge(from, to, weight);
+            //System.out.println("From: " + from);
+            //System.out.println("To: " + to);
+            //System.out.println("Weight: " + weight);
         }
-        return null;
+        reader.close();
+        } catch (IOException e) {
+            System.out.println("File not found");
+        }
+        
     }
 
+    //Function to print the adjlist
+    //Loop through the adjlist and print the city name
+    //Then loop through the hashset of edges and print the edge
     public void printAdjList() {
+        int counter = 0;
         for (Vertex city : adjList.keySet()) {
             System.out.print(city.getName() + " -> ");
+            counter++;
             Set<Edge> edges = adjList.get(city);
+            
             for (Edge edge : edges) {
                 System.out.print(edge.getTo().getName() + " (" + edge.getWeight() + ") ");
             }
             System.out.println();
+            System.out.println("Counter: " + counter);
+            System.out.println();
+        }
+        if (counter < adjList.size()) {
+            System.out.println("Not all cities are printed");
+            System.out.println("There is maybe collision in the hashmap");
+        }
+        System.out.println(adjList.size());
+        System.out.println(vertex.size());
+    }
+
+    //Function to print all vertex names
+    //Loop through the adjlist and print the city name
+    public void printAllVertexNames() {
+
+        for (Vertex city : adjList.keySet()) {
+
+            System.out.println(city.getName());
         }
     }
+    //
+
 
     public boolean isConnected() {
         // Create a set to keep track of visited vertices
@@ -170,88 +216,13 @@ public class AdjacencyList {
         return visited.size() == adjList.keySet().size();
     }
     
-
-
     public static void main(String[] args) {
-    AdjacencyList graph = new AdjacencyList();
-
-    graph.addCity("Laem Chabang");
-    graph.addCity("Bangkok");
-    graph.addCity("Hong Kong");
-    graph.addCity("Nansha New Port");
-    graph.addCity("Tokyo");
-    graph.addCity("Yokohama");
-    graph.addCity("Nagoya");
-    graph.addCity("Kobe");
-    graph.addCity("Hakata");
-    graph.addCity("Kaohsiung");
-    graph.addCity("Keelung");
-    graph.addCity("Yantian");
-    graph.addCity("Chittagong");
-    graph.addCity("Shanghai");
-    graph.addCity("Dalian");
-    graph.addCity("Xingang");
-    graph.addCity("Qingdao");
-    graph.addCity("Singapore");
-    graph.addCity("Tanjung Pelepas");
-    graph.addCity("Jakarta");
-    graph.addCity("Surabaya");
-    graph.addCity("Haiphong");
-    graph.addCity("Ningbo");
-    graph.addCity("Mombasa");
-    graph.addCity("Dar es Salaam");
-
-    graph.addEdge("Bangkok", "Laem Chabang", 1);
-    graph.addEdge("Laem Chabang", "Hong Kong", 5);
-    graph.addEdge("Hong Kong", "Nansha New Port", 1);
-    graph.addEdge("Nansha New Port", "Tokyo", 5);
-    graph.addEdge("Tokyo", "Yokohama", 1);
-    graph.addEdge("Yokohama", "Nagoya", 1);
-    graph.addEdge("Nagoya", "Kobe", 1);
-    graph.addEdge("Kobe", "Hakata", 2);
-    graph.addEdge("Kaohsiung", "Keelung", 2);
-    graph.addEdge("Keelung", "Nansha New Port", 2);
-    graph.addEdge("Nansha New Port", "Yantian", 1);
-    graph.addEdge("Yantian", "Hong Kong", 1);
-    graph.addEdge("Hong Kong", "Chittagong", 9);
-    graph.addEdge("Shanghai", "Dalian", 4);
-    graph.addEdge("Dalian", "Xingang", 2);
-    graph.addEdge("Xingang", "Qingdao", 3);
-    graph.addEdge("Qingdao", "Keelung", 3);
-    graph.addEdge("Keelung", "Singapore", 6);
-    graph.addEdge("Singapore", "Tanjung Pelepas", 2);
-    graph.addEdge("Tanjung Pelepas", "Jakarta", 3);
-    graph.addEdge("Jakarta", "Surabaya", 2);
-    graph.addEdge("Chittagong", "Tanjung Pelepas", 8);
-    graph.addEdge("Tanjung Pelepas", "Singapore", 2);
-    graph.addEdge("Singapore", "Laem Chabang", 4);
-    graph.addEdge("Laem Chabang", "Ningbo", 1);
-    graph.addEdge("Chittagong", "Singapore", 8);
-    graph.addEdge("Tanjung Pelepas", "Keelung", 7);
-    graph.addEdge("Keelung", "Kaohsiung", 2);
-    graph.addEdge("Kaohsiung", "Hong Kong", 2);
-    graph.addEdge("Hong Kong", "Haiphong", 3);
-    graph.addEdge("Haiphong", "Hong Kong", 3);
-    graph.addEdge("Hong Kong", "Kaohsiung", 2);
-    graph.addEdge("Kaohsiung", "Keelung", 2);
-    graph.addEdge("Ningbo", "Nansha New Port", 4);
-    graph.addEdge("Nansha New Port", "Tanjung Pelepas", 4);
-    graph.addEdge("Tanjung Pelepas", "Mombasa", 13);
-    graph.addEdge("Mombasa", "Dar es Salaam", 5);
-    graph.addEdge("Dar es Salaam", "Tanjung Pelepas", 13);
-    graph.addEdge("Tanjung Pelepas", "Laem Chabang", 3);
-    graph.addEdge("Laem Chabang", "Ningbo", 1);
-    
-    graph.printAdjList();
-
-    boolean connected = graph.isConnected();
-    System.out.println("The graph is " + (connected ? "" : "not ") + "connected.");
-    
-
-
-
-
-
+        AdjacencyList graph = new AdjacencyList();
+        graph.initGraphFromFile("network.txt");
+        System.out.println();
+        graph.printAllVertexNames();
+        graph.printAdjList();
+        
+ 
     }
-
 }
