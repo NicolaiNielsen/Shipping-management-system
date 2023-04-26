@@ -4,7 +4,33 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Set;
+
+
+//A graph is a way of representing relationships between pairs of objects. 
+//Meaning that a graph consists of vertices and form a pairwise connection between them with edges
+//We wanna implement an undirected graph with weight where (u, v) is is the same (v, u)
+//As opposed to a directed graph as can be assumed to be sailing routes are symmetric: if ship has sailed from A to B, then it can go from B to A.
+//However in reality it might not be as simple..
+
+//Vertices u and v said to be are adjacent if the endspoints of the edge are u and v. 
+//An edge is incident to af vertex if it is one of it's endpoints. 
+
+//To define a graph interface or not?
+//Too much work if we start defining functions we dont need
+
+//Adjancency list stores a list of incident edges to the given vertex. 
+//More specifically, for every vertex, we have a list containing edges incident to that vertext
+//Allows to for quick access to incident edges + adjacent vertices
+//Java collection --> List, queue, set
+// "We require that the primary structure for an adjacency list maintain the collection V of vertices in a way so that we can locate the secondary structure I(v)
+// for a given vertex v in O(1) time." So the basic idea behind adjlist is to have a vertex, where each vertext contains a list of its adjacent vertexies
+// Many ways of implementing it - arrays, linkedlist
+//Typically the collection is a list/linkedlist
+//The collection of vertices must be able to acess the secondary structure or auxilary data structure (the hashset) in O(1)
+//HashMap<Vertex,Set<Edge>> outEdge = new HashMap<>();
+
 
 public class AdjacencyList {
 
@@ -27,7 +53,7 @@ public class AdjacencyList {
     }
 
     //Nested edge class representing the route between two cities with the weight being travel days
-    class Edge {
+    class Edge implements Comparable<Edge> {
         private Vertex from;
         private Vertex to;
         private int weight;
@@ -52,6 +78,10 @@ public class AdjacencyList {
 
         public String toString() {
             return from.getName() + " - " + weight + " -> " + to.getName();
+        }
+
+        public int compareTo(Edge other) {
+            return Integer.compare(this.weight, other.weight);
         }
     }
     // NESTED A DATA structure that represents the adjlist
@@ -112,7 +142,7 @@ public class AdjacencyList {
     //The function should check whether or not the vertex exists in the vertex hashmap
     //f not then create a new vertex object and add it to the hashmap and adjlist
     //Then create two edge objects for the bidirectional edge
-    //we need to add the edge to the hashset of the from the adjlist
+    
 
     public void addEdge(String from, String to, int weight) {
         // Check if the cities exist in the graph
@@ -151,77 +181,49 @@ public class AdjacencyList {
     //Loop through the adjlist and print the city name
     //Then loop through the hashset of edges and print the edge
     public void printAdjList() {
+
         int counter = 0;
-        for (Vertex city : adjList.keySet()) {
-            System.out.print(city.getName() + " -> ");
+
+        for (Vertex city : adjList.keySet()) { //using keyset() method for iteration over keySet
+            System.out.println(city.getName() + " -> ");
+            System.out.println(adjList.get(city).toString());
+            System.out.println();
             counter++;
-            Set<Edge> edges = adjList.get(city);
-            
-            for (Edge edge : edges) {
-                System.out.print(edge.getTo().getName() + " (" + edge.getWeight() + ") ");
-            }
-            System.out.println();
-            System.out.println("Counter: " + counter);
-            System.out.println();
         }
-        if (counter < adjList.size()) {
+        if (counter < adjList.size()) { //dunno, implemented cuz wierd vscode things
             System.out.println("Not all cities are printed");
             System.out.println("There is maybe collision in the hashmap");
         }
-        System.out.println(adjList.size());
-        System.out.println(vertex.size());
     }
 
-    //Function to print all vertex names
-    //Loop through the adjlist and print the city name
-    public void printAllVertexNames() {
+    //Graph traversal is sysematisk proecude for exploring a graph by looking at all vertices and edges.
+    public void DFS(AdjacencyList graph, Vertex v, Set<Vertex> visited) {
+        visited.add(v);
+        System.out.println("Visited: " + v.getName());
 
-        for (Vertex city : adjList.keySet()) {
-
-            System.out.println(city.getName());
-        }
-    }
-    //
-
-
-    public boolean isConnected() {
-        // Create a set to keep track of visited vertices
-        Set<Vertex> visited = new HashSet<>();
-        
-        // Create a queue for BFS
-        LinkedList<Vertex> queue = new LinkedList<>();
-        
-        // Add any vertex to the queue and mark it as visited
-        Vertex start = adjList.keySet().iterator().next();
-        queue.add(start);
-        visited.add(start);
-        
-        while (queue.size() != 0) {
-            // Dequeue a vertex from the queue
-            Vertex current = queue.poll();
-        
-            // Get all adjacent vertices of the dequeued vertex and check if they
-            // have been visited
-            Set<Edge> edges = adjList.get(current);
-            for (Edge edge : edges) {
-                Vertex adjacentVertex = edge.getTo();
-                if (!visited.contains(adjacentVertex)) {
-                    visited.add(adjacentVertex);
-                    queue.add(adjacentVertex);
-                }
+        for (Edge edge _ graph.adjList.get(v)) {
+            Vertex adjacentVertex = edge.getTo();
+            if (!visited.contains(adjacentVertex)) {
+                DFS(graph, adjacentVertex, visited);
             }
         }
-        
-        // Check if all vertices are visited
-        return visited.size() == adjList.keySet().size();
+        if (visited.size() == graph.adjList.size()) {
+            System.out.println("Graph is connected");
+        }
     }
-    
+
+    // Driver program to test methods of graph class
     public static void main(String[] args) {
         AdjacencyList graph = new AdjacencyList();
         graph.initGraphFromFile("network.txt");
         System.out.println();
-        graph.printAllVertexNames();
+       // graph.printAllVertexNames();
         graph.printAdjList();
+        Set<Vertex> visited = new HashSet<>();
+        graph.DFS(graph, graph.vertex.get("Bangkok"), visited);
+
+        //graph.DFS(graph.vertex.get("Bangkok"));
+        //graph.prims(graph.vertex.get("Bangkok"));
         
  
     }
