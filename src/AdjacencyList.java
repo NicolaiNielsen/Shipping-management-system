@@ -182,11 +182,11 @@ public class AdjacencyList {
     //Then loop through the hashset of edges and print the edge
     public void printAdjList() {
 
-        int counter = 0;
+        int counter = 0; //counter to check if all cities are printed
 
         for (Vertex city : adjList.keySet()) { //using keyset() method for iteration over keySet
             System.out.println(city.getName() + " -> ");
-            System.out.println(adjList.get(city).toString());
+            System.out.println(adjList.get(city).toString()); //returns a string representation of the hashset
             System.out.println();
             counter++;
         }
@@ -196,21 +196,26 @@ public class AdjacencyList {
         }
     }
 
-    //Graph traversal is sysematisk proecude for exploring a graph by looking at all vertices and edges.
+    //depth first search algorithm
+    //takes in a graph, a random vertex and a set of visited vertices
     public void DFS(AdjacencyList graph, Vertex v, Set<Vertex> visited) {
-        visited.add(v);
-        System.out.println("Visited: " + v.getName());
+        visited.add(v); //add the vertex to the visited set
+        System.out.println("Visited: " + v.getName()); 
 
-        for (Edge edge _ graph.adjList.get(v)) {
-            Vertex adjacentVertex = edge.getTo();
-            if (!visited.contains(adjacentVertex)) {
-                DFS(graph, adjacentVertex, visited);
+        for (Edge edge : graph.adjList.get(v)) { //for each edge in the hashset of edges in the adjlist
+            Vertex adjacentVertex = edge.getTo(); //get the adjacent vertex
+            if (!visited.contains(adjacentVertex)) { //if the adjacent vertex is not in the visited set, then call DFS recursively
+                DFS(graph, adjacentVertex, visited); //recursive call
             }
         }
-        if (visited.size() == graph.adjList.size()) {
+        if (visited.size() == graph.adjList.size()) { //if the size of the visited set is equal to the size of the adjlist, then the graph is connected
             System.out.println("Graph is connected");
+            System.out.println("Number of cities: " + visited.size());
+            System.out.println("Number of edges: " + graph.adjList.size());
         }
     }
+
+
 
     // Driver program to test methods of graph class
     public static void main(String[] args) {
