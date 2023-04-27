@@ -1,3 +1,4 @@
+package Portfolio3;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -268,7 +269,7 @@ public class AdjacencyList {
     // Driver program to test methods of graph class
     public static void main(String[] args) {
         AdjacencyList graph = new AdjacencyList();
-        graph.initGraphFromFile("network.txt");
+        graph.initGraphFromFile("src/Portfolio3/network.txt");
         System.out.println();
         // graph.printAllVertexNames();
         graph.printAdjList();
