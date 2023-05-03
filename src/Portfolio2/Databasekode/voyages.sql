@@ -230,3 +230,33 @@ SELECT * FROM shipment;
 -- WHERE depdate = 230424 AND depport = Laem Chabang AND arrport = Bangkok AND total_volume <= capacity AND total_volume <= userinputvolume+total_volume
 
 
+
+SELECT voyage.id,
+COALESCE(SUM(shipment.volume),0) as current_volume
+FROM voyage
+LEFT JOIN shipment ON voyage.id = shipment.voyageid
+GROUP BY voyage.id;
+
+
+SELECT voyage.id, voyage.depdate, voyage.arrdate, voyage.vessel,
+voyage.depport, voyage.arrport, vessel.capacity,
+COALESCE(SUM(shipment.volume),0) as current_volume
+FROM voyage
+LEFT JOIN vessel ON voyage.vessel = vessel.name
+LEFT JOIN shipment ON voyage.id = shipment.voyageid -- display all records from voyage, but also display if matching records from shipment
+
+GROUP BY voyage.id;
+
+SELECT v1.vessel, v1.depdate, v1.arrdate, v1.id,
+v2.vessel, v2.depdate, v2.arrdate, v2.id
+from voyage v1 inner join voyage v2
+WHERE v1.vessel = v2.vessel AND v1.depdate <=  v2.depdate
+AND v1.arrdate > v2.depdate AND v1.id <> v2.id AND v1.depdate < v2.arrdate;
+
+SELECT * from shipment;
+SELECT * from shipment;
+
+INSERT INTO SHIPMENT (voyageid, volume, customer) 
+VALUES (1, 3000, "TESTss");
+
+SELECT * from shipment;

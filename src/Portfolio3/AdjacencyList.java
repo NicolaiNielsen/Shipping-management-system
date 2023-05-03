@@ -169,9 +169,6 @@ public class AdjacencyList {
                 String to = parts[1];
                 int weight = Integer.parseInt(parts[2]);
                 addEdge(from, to, weight);
-                // System.out.println("From: " + from);
-                // System.out.println("To: " + to);
-                // System.out.println("Weight: " + weight);
             }
             reader.close();
         } catch (IOException e) {
@@ -199,17 +196,21 @@ public class AdjacencyList {
         }
     }
 
+    int count =  0;
     // depth first search algorithm
     // takes in a graph, a random vertex and a set of visited vertices
     public void DFS(AdjacencyList graph, Vertex v, Set<Vertex> visited) {
         visited.add(v); // add the vertex to the visited set
         System.out.println("Visited: " + v.getName());
-
+       
+        
         for (Edge edge : graph.adjList.get(v)) { // for each edge in the hashset of edges in the adjlist
-            Vertex adjacentVertex = edge.getTo(); // get the adjacent vertex
+            Vertex adjacentVertex = edge.getTo(); 
+            count++;// get the adjacent vertex
             if (!visited.contains(adjacentVertex)) { // if the adjacent vertex is not in the visited set, then call DFS
-                                                     // recursively
-                DFS(graph, adjacentVertex, visited); // recursive call
+                                                   // recursively
+                DFS(graph, adjacentVertex, visited);
+                System.out.println(count); // recursive call
             }
         }
         if (visited.size() == graph.adjList.size()) { // if the size of the visited set is equal to the size of the
@@ -239,10 +240,13 @@ public class AdjacencyList {
         // Declare a variable to store the total weight of the minimum spanning tree
         int totalWeight = 0;
 
+        System.out.println(priorityQueue);
+
         // Iterate until the priority queue is empty
         while (!priorityQueue.isEmpty()) {
             // Remove the edge with the smallest weight from the priority queue
             Edge minEdge = priorityQueue.poll();
+
 
             // Get the vertices of the removed edge
             Vertex to = minEdge.getTo();
@@ -251,6 +255,8 @@ public class AdjacencyList {
             if (!visited.contains(to)) {
                 // Mark the destination vertex as visited
                 visited.add(to);
+                System.out.println("Visited: " + to.getName());
+                System.out.println("visited weight: " + minEdge.getWeight());
 
                 // Add the weight of the removed edge to the total weight
                 totalWeight += minEdge.getWeight();
@@ -259,6 +265,7 @@ public class AdjacencyList {
                 for (Edge edge : adjList.get(to)) {
                     priorityQueue.add(edge);
                 }
+                System.out.println(priorityQueue);
             }
         }
 
@@ -277,22 +284,22 @@ public class AdjacencyList {
         graph.DFS(graph, graph.vertex.get("Bangkok"), visited);
         graph.prims(graph.vertex.get("Bangkok"));
 
-        AdjacencyList graph2 = new AdjacencyList();
-        graph2.addEdge(String.valueOf(7), String.valueOf(6), 1);
-        graph2.addEdge(String.valueOf(8), String.valueOf(2), 2);
-        graph2.addEdge(String.valueOf(6), String.valueOf(5), 2);
-        graph2.addEdge(String.valueOf(0), String.valueOf(1), 4);
-        graph2.addEdge(String.valueOf(2), String.valueOf(5), 4);
-        graph2.addEdge(String.valueOf(8), String.valueOf(6), 6);
-        graph2.addEdge(String.valueOf(2), String.valueOf(3), 7);
-        graph2.addEdge(String.valueOf(7), String.valueOf(8), 7);
-        graph2.addEdge(String.valueOf(0), String.valueOf(7), 8);
-        graph2.addEdge(String.valueOf(1), String.valueOf(2), 8);
-        graph2.addEdge(String.valueOf(3), String.valueOf(4), 9);
-        graph2.addEdge(String.valueOf(5), String.valueOf(4), 10);
-        graph2.addEdge(String.valueOf(1), String.valueOf(7), 11);
-        graph2.addEdge(String.valueOf(3), String.valueOf(5), 14);
-        graph2.prims(graph2.vertex.get("0"));
+        // AdjacencyList graph2 = new AdjacencyList();
+        // graph2.addEdge(String.valueOf(7), String.valueOf(6), 1);
+        // graph2.addEdge(String.valueOf(8), String.valueOf(2), 2);
+        // graph2.addEdge(String.valueOf(6), String.valueOf(5), 2);
+        // graph2.addEdge(String.valueOf(0), String.valueOf(1), 4);
+        // graph2.addEdge(String.valueOf(2), String.valueOf(5), 4);
+        // graph2.addEdge(String.valueOf(8), String.valueOf(6), 6);
+        // graph2.addEdge(String.valueOf(2), String.valueOf(3), 7);
+        // graph2.addEdge(String.valueOf(7), String.valueOf(8), 7);
+        // graph2.addEdge(String.valueOf(0), String.valueOf(7), 8);
+        // graph2.addEdge(String.valueOf(1), String.valueOf(2), 8);
+        // graph2.addEdge(String.valueOf(3), String.valueOf(4), 9);
+        // graph2.addEdge(String.valueOf(5), String.valueOf(4), 10);
+        // graph2.addEdge(String.valueOf(1), String.valueOf(7), 11);
+        // graph2.addEdge(String.valueOf(3), String.valueOf(5), 14);
+        // graph2.prims(graph2.vertex.get("0"));
 
 
 
